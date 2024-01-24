@@ -30,7 +30,7 @@ class Hangman
       puts "Would you like to play again? Type 'y' for yes or 'n' for no."
     end
     if gets.chomp == "y"
-      start_game()
+      start_playing()
     else
       puts "Thanks for playing!"
     end
@@ -92,7 +92,6 @@ class Hangman
 
   def show_scoreboard()
     puts "\n#{@correct_letters_display.join(" ")}"
-    #binding.pry
     show_hangman(@incorrect_guesses["letters"].length + @incorrect_guesses["words"].length)
     puts "Incorrect letters: #{@incorrect_guesses["letters"].join(" ")}" if @incorrect_guesses["letters"].length > 0
     puts "Incorrect words: #{@incorrect_guesses["words"].join(" ")}" if @incorrect_guesses["words"].length > 0
@@ -100,26 +99,20 @@ class Hangman
 
   def self.get_game_to_load()
     saved_games_arr = Dir.glob('saved_games/*.json')
-    puts "Would you like to load the last game you played? Type 'y' for yes or 'n' for no."
-    answer = gets.chomp.upcase
-    if answer == 'Y'
-      saved_games_arr[0]
+    puts "Which saved game would you like to load?\n\n"
+    for i in 1..saved_games_arr.length
+      id_arr = saved_games_arr[i-1].split('/')[1].split('.')[0].split('-')
+      date = Time.parse(id_arr[0]).strftime("%d of %B")
+      correct_letters_display = id_arr[1].split('').join(' ')
+      num_wrong_guesses = id_arr[2]
+      puts "#{i}) From #{date}: #{correct_letters_display}  (#{num_wrong_guesses} wrong guesses)"
+    end
+    puts "\nPlease enter the corresponding number or type 'n' for a new game."
+    answer = gets.chomp.to_i
+    if answer > 0 && answer <= saved_games_arr.length
+      saved_games_arr[answer-1]
     else
-      puts "Which saved game would you like to load?\n\n"
-      for i in 1..saved_games_arr.length
-        id_arr = saved_games_arr[i-1].split('/')[1].split('.')[0].split('-')
-        date = Time.parse(id_arr[0]).strftime("%d of %B")
-        correct_letters_display = id_arr[1].split('').join(' ')
-        num_wrong_guesses = id_arr[2]
-        puts "#{i}) From #{date}: #{correct_letters_display}  (#{num_wrong_guesses} wrong guesses)"
-      end
-      puts "\nPlease enter the corresponding number or type 'n' for a new game."
-      answer = gets.chomp.to_i
-      if answer > 0 && answer <= saved_games_arr.length
-        saved_games_arr[answer-1]
-      else
-        "new_game"
-      end
+      "new_game"
     end
   end
 
@@ -227,7 +220,7 @@ class Guess < Hangman
   end
 end
 
-def start_game()
+def start_playing()
   if Dir.glob('saved_games/*.json').length == 0
     game = Hangman.create_new_game()
   else
@@ -251,4 +244,4 @@ end
 
 
 
-start_game()
+start_playing()
